@@ -167,6 +167,7 @@ class Kedi:
         self.kare = 0
         self.balon_metni = None
         self.su_kalan_kare = 0
+        self._animasyon_id = None
 
         self._arka_plan_ciz()
         self._animasyon_dongusu()
@@ -185,6 +186,11 @@ class Kedi:
 
     def su_hatirlat(self, saniye=15):
         self.su_kalan_kare = saniye * 20
+
+    def durdur(self):
+        if self._animasyon_id is not None:
+            self.tuval.after_cancel(self._animasyon_id)
+            self._animasyon_id = None
 
     def _animasyon_dongusu(self):
         self.kare += 1
@@ -206,7 +212,7 @@ class Kedi:
             self._balon_ciz(self.balon_metni)
 
         self._cerceve_ciz()
-        self.tuval.after(50, self._animasyon_dongusu)
+        self._animasyon_id = self.tuval.after(50, self._animasyon_dongusu)
 
     def _mola_hareketi(self):
         self.x += P / 2 * self.yon

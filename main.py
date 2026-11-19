@@ -105,7 +105,9 @@ class NekodoroUygulamasi(ctk.CTk):
             SAHNE_GENISLIK - 12, 6, anchor="ne", text="x", fill=CIZGI_RENGI,
             font=(PIKSEL_FONT, -16, "bold"), tags="kapat",
         )
-        self.tuval.tag_bind("kapat", "<Button-1>", lambda olay: self.destroy())
+        # Tuval kendi tıklama olayının içindeyken yok edilirse Tk çöküyor,
+        # bu yüzden kapatma olay bittikten sonraya erteleniyor.
+        self.tuval.tag_bind("kapat", "<Button-1>", lambda olay: self.after_idle(self._kapat))
         self.tuval.tag_bind("kapat", "<Enter>",
                             lambda olay: self.tuval.itemconfigure(kapat, fill=SAPKA_RENGI))
         self.tuval.tag_bind("kapat", "<Leave>",
@@ -169,6 +171,11 @@ class NekodoroUygulamasi(ctk.CTk):
         x = sag - self.winfo_reqwidth()
         y = alt - self.winfo_reqheight()
         self.geometry(f"+{x}+{y}")
+
+    def _kapat(self):
+        self._durdur()
+        self.kedi.durdur()
+        self.destroy()
 
     def _surukleme_basladi(self, olay):
         self.surukle_x = olay.x_root - self.winfo_x()
