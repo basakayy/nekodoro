@@ -189,8 +189,8 @@ class NekodoroUygulamasi(ctk.CTk):
     def baslat_duraklat(self):
         if self.calisiyor_mu:
             self._durdur()
-            self.kedi.durum_degistir("bekle")
-            self.kedi.konus("Mola mı? Bekliyorum...")
+            self.kedi.durum_degistir("uyku")
+            self.kedi.konus("Zzz... Devam'a basınca uyanırım.")
         else:
             if self.asama == "hazir":
                 self.asama = "calisma"
@@ -206,7 +206,7 @@ class NekodoroUygulamasi(ctk.CTk):
         self._durdur()
         self.asama = "hazir"
         self.kalan_saniye = CALISMA_SURESI
-        self.kedi.durum_degistir("bekle")
+        self.kedi.durum_degistir("uyku")
         self.kedi.konus("Hazır olunca Başlat'a bas.")
         self._ekrani_guncelle()
 
@@ -249,12 +249,12 @@ class NekodoroUygulamasi(ctk.CTk):
             self.calisiyor_mu = False
             self.asama = "hazir"
             self.kalan_saniye = CALISMA_SURESI
-            self.kedi.durum_degistir("bekle")
+            self.kedi.durum_degistir("uyku")
             self.kedi.konus("Mola bitti! Hazırsan yeni bir tur başlatalım.")
 
     def _kediyi_asamaya_gore_ayarla(self):
         if self.asama == "calisma":
-            self.kedi.durum_degistir("uyku")
+            self.kedi.durum_degistir("calisma")
             self.kedi.sus()
         else:
             self.kedi.durum_degistir("mola")

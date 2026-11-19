@@ -16,7 +16,12 @@ RENKLER = {
     "S": "#ffffff",
     "U": "#5aa9f0",
     "u": "#bfe1ff",
+    "E": "#2b3a55",
+    "M": "#c9ced6",
+    "m": "#9aa1ad",
 }
+
+KOD_RENKLERI = ["#7ee787", "#ff9ac1", "#79c0ff", "#ffd479"]
 
 ARKA_PLAN = "#f3f7fc"
 DAMA_RENKLERI = ["#ffffff", "#d3e3f6"]
@@ -114,6 +119,72 @@ UYKU_GOVDE_2 = UYKU_GOVDE_1[:8] + [
 
 UYKU_KAFA = KAFA_GOZ_KAPALI[:16] + ["KKKKKKKKKKKKK..."]
 
+OTURAN_KAFA = KAFA[:15] + [".KDDRKKKKKKRDDK.", "..KKKKKKKKKKKK.."]
+OTURAN_KAFA_GOZ_KAPALI = KAFA_GOZ_KAPALI[:15] + OTURAN_KAFA[15:]
+
+OTURAN_GOVDE = [
+    "....KKKKKKKKKK......",
+    "...KOOOOOOOOOOK.....",
+    "..KOOOOOOOOOOooK....",
+    "..KOOOOOOOOOOoooK...",
+    ".KOOOOOOOOOOOoooK...",
+    ".KOOOOOOOOOOOOooK...",
+    "KOOOOOOOOOOOOOOOK...",
+    "KOOOOOOOOOOOOOOOK...",
+    "KBOOOOOOOOOOOOOOK...",
+    "KKKKKKKKKKKKKKKKK...",
+]
+
+OTURAN_KUYRUK_1 = [
+    ".K....",
+    "KBK...",
+    "KOK...",
+    "KOKKKK",
+    "KOOOOO",
+    "KKKKKK",
+]
+
+OTURAN_KUYRUK_2 = [
+    "......",
+    "KK....",
+    "KBK...",
+    "KOKKKK",
+    "KOOOOO",
+    "KKKKKK",
+]
+
+KOL_ASAGIDA = [
+    "KKKKKKK...",
+    "OOOOOOOKK.",
+    "KKKKKKKooK",
+]
+
+KOL_YUKARIDA = [
+    "KKKKKKKKK.",
+    "OOOOOOOooK",
+    "KKKKKKKKK.",
+]
+
+LAPTOP = [
+    "..KKKKKKKKKKKK..",
+    "..KEEEEEEEEEEK..",
+    "..KEEEEEEEEEEK..",
+    "..KEEEEEEEEEEK..",
+    "..KEEEEEEEEEEK..",
+    "..KEEEEEEEEEEK..",
+    "..KEEEEEEEEEEK..",
+    "..KKKKKKKKKKKK..",
+    ".KMMMMMMMMMMMMK.",
+    "KMmMmMmMmMmMmMMK",
+    "KKKKKKKKKKKKKKKK",
+]
+
+# (girinti, uzunluk)
+KOD_SATIRLARI = [(0, 6), (1, 7), (1, 4), (2, 6), (1, 5), (0, 3)]
+
+CALISMA_GENISLIK = 39
+CALISMA_YUKSEKLIK = 26
+
 
 def yan_yana(sol, sag):
     return [sol_satir + sag_satir for sol_satir, sag_satir in zip(sol, sag)]
@@ -160,7 +231,7 @@ class Kedi:
         self.yukseklik = yukseklik
         self.balon_y = balon_y
 
-        self.durum = "bekle"
+        self.durum = "uyku"
         self.x = genislik / 2
         self.zemin_y = yukseklik - 4 * P
         self.yon = 1
@@ -198,6 +269,8 @@ class Kedi:
 
         if self.durum == "uyku":
             self._uyuyan_kedi()
+        elif self.durum == "calisma":
+            self._calisan_kedi()
         elif self.durum == "mola":
             self._mola_hareketi()
         else:
@@ -247,6 +320,46 @@ class Kedi:
             zy = self.zemin_y - 17 * P - ilerleme * 10 * P
             boyut = 2 if ilerleme < 0.5 else 3
             self._sprite_ciz(Z_HARFI, zx, zy, piksel=boyut, ortala=False)
+
+    def _calisan_kedi(self):
+        x0 = int((self.x - CALISMA_GENISLIK * P / 2) // P) * P
+        y0 = self.zemin_y - CALISMA_YUKSEKLIK * P
+
+        def parca(sprite, sutun, satir):
+            self._sprite_ciz(sprite, x0 + sutun * P, y0 + satir * P, ortala=False)
+
+        kuyruk = OTURAN_KUYRUK_1 if (self.kare // 15) % 2 == 0 else OTURAN_KUYRUK_2
+        kafa = OTURAN_KAFA_GOZ_KAPALI if self.kare % 80 < 3 else OTURAN_KAFA
+        tikliyor = self.kare % 7 in (0, 1) or self.kare % 11 == 0
+        kol = KOL_YUKARIDA if tikliyor else KOL_ASAGIDA
+
+        parca(kuyruk, 0, 20)
+        parca(OTURAN_GOVDE, 3, 16)
+        parca(kafa, 5, 0)
+        parca(LAPTOP, 23, 15)
+        self._ekran_ciz(x0 + 26 * P, y0 + 16 * P)
+        parca(kol, 18, 21)
+
+    def _ekran_ciz(self, x, y):
+        toplam = sum(uzunluk for _, uzunluk in KOD_SATIRLARI)
+        kalan = (self.kare // 3) % (toplam + 15)
+        imlec_x, imlec_y = x + P, y
+
+        for i, (girinti, uzunluk) in enumerate(KOD_SATIRLARI):
+            if kalan <= 0:
+                break
+            n = min(uzunluk, kalan)
+            kalan -= n
+            sx = x + (girinti + 1) * P
+            sy = y + i * P
+            self.tuval.create_rectangle(sx, sy + 1, sx + n * P, sy + 1 + P // 2,
+                                        fill=KOD_RENKLERI[i % len(KOD_RENKLERI)],
+                                        outline="", tags=HAREKETLI)
+            imlec_x, imlec_y = sx + n * P, sy
+
+        if (self.kare // 8) % 2 == 0:
+            self.tuval.create_rectangle(imlec_x, imlec_y + 1, imlec_x + P // 2, imlec_y + P,
+                                        fill="white", outline="", tags=HAREKETLI)
 
     def _sprite_ciz(self, sprite, orta_x, alt_y, piksel=P, ortala=True):
         genislik = len(sprite[0]) * piksel
@@ -320,7 +433,11 @@ class Kedi:
         self.tuval.create_rectangle(sol, ust + P, sag, alt - P, fill=k, **e)
         self.tuval.create_rectangle(sol + P, ust + P, sag - P, alt - P, fill="white", **e)
 
-        kuyruk_x = max(sol + 3 * P, min(sag - 6 * P, self.x + 7 * P * self.yon))
+        if self.durum == "calisma":
+            hedef = self.x - 7 * P
+        else:
+            hedef = self.x + 7 * P * self.yon
+        kuyruk_x = max(sol + 3 * P, min(sag - 6 * P, hedef))
         eski_yon = self.yon
         self.yon = 1
         self._sprite_ciz(BALON_KUYRUGU, kuyruk_x, alt - P, ortala=False)

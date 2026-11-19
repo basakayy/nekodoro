@@ -4,11 +4,12 @@ Ekranın köşesinde duran, domates başlıklı piksel bir kediyle Pomodoro saya
 
 <p align="center">
   <img src="gorseller/neko.png" alt="Nekodoro" width="288">
+  <img src="gorseller/calisma.png" alt="Odaklanma" width="288">
   <img src="gorseller/mola.png" alt="Yürüyüş molası" width="288">
   <img src="gorseller/su.png" alt="Su hatırlatması" width="288">
 </p>
 
-- **25 dakika odaklanma:** Neko uyur.
+- **25 dakika odaklanma:** Neko da laptopunun başında seninle çalışır. Duraklatınca uyur.
 - **5 dakika mola:** Süre dolunca Neko uyanır, ses çalar ve seni kalkıp yürümeye çağırır. Molada o da yürür, zıplar.
 - **Su hatırlatması:** Her 30 dakikalık çalışmada su içmeni hatırlatır.
 - **Tur ve toplam süre:** Kaçıncı turda olduğunu ve toplam ne kadar çalıştığını gösterir.
